@@ -1,0 +1,49 @@
+# Using grinder to create fake sequencing libraries based on specific primers
+
+module load perl/5.26.0-foss-2017a
+
+## Get the SILVA sequences for the Lacto species of interest using download feature on SILVA ARB website
+
+## Primer primers were created so that were set up as following
+>Forward
+CCTACGGGAGGCAGCAG
+>Reverse
+CCGTCAATTYMTTTRAGT
+
+# Primer analysis
+## Primer 1
+/home/n9157212/perl5/bin/grinder -reference_file SILVA/arb-silva.de_2020-09-09_id878957_tax_silva.fasta -forward_reverse Primer_pair_one.fna -length_bias 0 -unidirectional 1 -di 0  -nl 20 -total_reads 1000 -od SILVA/Primer_pair_1 -bn Primer_pair_1
+
+## Coverage
+grep "Library coverage" SILVA/silva_output.txt > Primer_1_coverage.txt
+
+
+## Abudances
+## Taxonomy was counted from the output 'raw read' files from the program
+grep ">" *-reads.fa >> Primer_pair_3_taxon.txt 
+# Outputs were sorted into a overall excel sheet for sorting in R for each primer and species
+
+library(dplyr)
+NCBI_species <- read.csv("NCBI_species_abundance.csv")
+## Primer 1
+NCBI_species_Primer1 <- NCBI_species %>% filter(Primer_pair == "Primer_pair_1")
+
+# Iners
+NCBI_species_Primer1_Iners <- NCBI_species_Primer1 %>% filter(Species == "iners")
+nrow(NCBI_species_Primer1_Iners)
+
+# acidophilus
+NCBI_species_Primer1_acidophilus <- NCBI_species_Primer1 %>% filter(Species == "acidophilus")
+nrow(NCBI_species_Primer1_acidophilus)
+
+# gasseri
+NCBI_species_Primer1_gasseri <- NCBI_species_Primer1 %>% filter(Species == "gasseri")
+nrow(NCBI_species_Primer1_gasseri)
+
+# jensenii
+NCBI_species_Primer1_jensenii <- NCBI_species_Primer1 %>% filter(Species == "jensenii")
+nrow(NCBI_species_Primer1_jensenii)
+
+# jensenii
+NCBI_species_Primer1_crispatus <- NCBI_species_Primer1 %>% filter(Species == "crispatus")
+nrow(NCBI_species_Primer1_crispatus)
