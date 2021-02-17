@@ -42,7 +42,7 @@ Each individual analysis will describe the methods use and then go into detail o
   | PRJNA543861 [11] | Mid endometrial samples from women undergoing a hysterectomy and compared with other parts of the reproductive tract |
 
 
-  The raw reads were downloaded from NCBI using fastq-dump and, if paired end, reads were split. Raw data was then uploaded into QIIME2 using standard parameters and quality control checks were run. Based on the QC data, denoising and trimming was completed with custom values for each dataset using the DADA2 algorithm within QIIME2. The denoised DNA sequences and corresponding biom table were downloaded from QIIME2 and used in R with a full length taxonomic classifier and the DADA2 software. Custom R scripts were used to identify the number of sequences that had been classified as a Lactobacillus species from the full dataset.   
+  The raw reads were downloaded from NCBI using fastq-dump and, if paired end, reads were split. Raw data was then uploaded into QIIME2 using standard parameters and quality control checks were run. Based on the QC data, denoising and trimming was completed with custom values for each dataset using the DADA2 algorithm within QIIME2. The denoised DNA sequences were used with full-length Greengenes taxonomic classifer and predicted taxonomy was exported from QIIME2 into a external file. Custom R scripts were used to identify the number of sequences that had been classified as a Lactobacillus species from the full dataset.   
 
   Each primer pair was used to create in silico 16S rRNA gene read libraries using custom databases with the five *Lactobacillus* species of interest (downloaded from SILVA) using [Grinder][], a sequencing simulator. 
 
