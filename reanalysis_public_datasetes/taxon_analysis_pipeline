@@ -1,0 +1,46 @@
+## Analysis pipeline for reanalysis of publicly available datasets
+
+# Download raw reads and map to human genome to get non-host reads
+
+for next in $(cat list.txt); do fastq-dump --gzip $next; bowtie2 -x ../../bowtie2/human_database -U "$next".fastq.gz -S "$next".sam --un unmapped_reads_"$next".fastq.gz; done
+
+## QIIME2 analysis for all four datasets
+
+# Load the QIIME2 environment from conda
+conda activate qiime2-2018.11
+
+# Upload to QIIME2
+# Created a manifest file in excel for each individual study
+qiime tools import --type 'SampleData[PairedEndSequencesWithQuality]' --input-path pe-33-manifest --output-path paired-end-demux.qza --input-format PairedEndFastqManifestPhred33
+
+# Quality control
+qiime demux summarize --i-data paired-end-demux.qza --o-visualization demux.qzv
+
+# Denoise with Illumina and pyrosequencing
+
+# Pyro
+qiime dada2 denoise-pyro --i-demultiplexed-seqs single-end-PRJNA329174.qza --p-trim-left 0 --p-trunc-len 305 --o-representative-sequences ../Analysis_folder/PRJNA329174-rep-seqs-dada2.qza --o-table ../Analysis_folder/PRJNA329174-table-dada2.qza --o-denoising-stats ../Analysis_folder/PRJNA329174-stats-dada2.qza
+
+# DADA2 denoising, quality metrics changed based on previous output from data
+qiime dada2 denoise-paired --i-demultiplexed-seqs paired-end-demux.qza --p-trim-left-f 0 --p-trim-left-r 0 --p-trunc-len-f 250 --p-trunc-len-r 250 --o-table table.qza --o-representative-sequences rep-seqs.qza --o-denoising-stats denoising-stats.qza
+  
+# A full length Greengenes feature classifer was used to classify representitive sequences from the DADA2 denoising to create taxonomy files for each dataset
+qiime feature-classifier classify-sklearn --i-reads rep-seqs.qza --i-classifier  --o-classification taxonomy.qza
+
+# The taxonomic classification were exported into a table than was then used for custom R filtering 
+qiime tools export --input-path taxonomy.qza --output-path taxonomy-classification
+
+## R analysis sorting to determine number of reported Lacto species
+library(tibble)
+library(dplyr)
+library(tidyr)
+
+taxonomic_dataset <- read.delim("taxonomy-classification/taxonomy.tsv")
+# Total number of taxonomic
+nrow(taxonomic_dataset)
+
+# Seperate taxonomy into sortable columns
+taxon_seperate <- taxonomic_dataset %>% separate(Taxon, c("kingdom", "k", "phylum","p","class", "c","order", "o","family", "f","genus", "g","species", "s"))
+
+lacto_taxon <- taxon_seperate %>% filter(g == "Lactobacillus")
+nrow(lacto_taxon)

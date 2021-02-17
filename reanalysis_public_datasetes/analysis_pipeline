@@ -1,6 +1,0 @@
-## Analysis pipeline for reanalysis of publicly available datasets
-
-# Download raw reads and map to human genome to get non-host reads
-
-for next in $(cat list.txt); do fastq-dump --gzip $next; bowtie2 -x ../../bowtie2/human_database -U "$next".fastq.gz -S "$next".sam --un unmapped_reads_"$next".fastq.gz; done
-
