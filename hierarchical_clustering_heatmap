@@ -1,0 +1,15 @@
+## Scripts to make the heatmap in the paper
+
+#Load necessary libraries
+library(RColorBrewer)
+library(gplots)
+library(vegan)
+#Read in the data
+Lacto_pivot <- read.csv("Lacto_pivot.csv", row.names=1)
+#Convert to matrix
+mat_data <- data.matrix(Lacto_pivot[,1:ncol(Lacto_pivot)])
+#Make dissimilarity matrix to view
+dis_sim<-vegdist(mat_data)
+#Make heatmap using Bray-Curtis distance for clustering
+a<-heatmap.2(mat_data, Colv = NULL, distfun = function(x) vegdist(x, method='bray'), dendrogram = 'row', hclustfun = function(x) hclust(x,method='average'), sepcolor = 'grey', sepwidth = c(0.02, 0.02), trace = 'none', colsep = c(seq(1:5)), rowsep = c(seq(1:25)), col  = c('white',brewer.pal(9, 'BuPu')), cexRow = 0.6, cexCol = 0.8, keysize = 1, margins = c(12, 8), breaks = c(0,0.01, 0.05, 0.1, 0.2,0.3, 0.4, 0.5,0.75,0.9, 1))
+
