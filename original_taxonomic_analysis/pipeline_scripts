@@ -1,0 +1,22 @@
+## Analysis pipeline for the original taxonomic analysis for endometrial data 
+
+## Original dataset is from this article published previously in the Pelzer lab
+
+Sequence clustering and operational taxonomic unit (OTU) selection was performed using a modified version of CD-HIT-OTU-454 which does not remove singleton clusters (29). Taxonomy was assigned to representative sequences by comparison to the latest build of the Greengenes database (https://greengenes.secondgenome.com/) using BLAST (https://blast.ncbi.nlm.nih.gov/Blast.cgi), and OTU tables were constructed from the output using a custom Perl script(30).
+
+## The CD-HIT-OTU script is written in python and a copy can be found within this folder. The original script was written by Weizhong Li and was altered to change the variable $cutoff to the number 1 to include singletons (as shown in the line of code below). 
+        $str = "$script_dir/clstr_select_rep.pl size 1 999999999 < $t1.nr2nd-all.clstr > $t1-pri-rep.ids";
+
+## The 1 after size is the change - it was originally a variable called $cutoff that is provided by an earlier step in the process as a lower bound for removing small clusters.
+
+## The taxonomic analysis was completed by assigning representative sequences  to the latest build of the Greengenes database (https://greengenes.secondgenome.com/) by comparison using BLAST (https://blast.ncbi.nlm.nih.gov/Blast.cgi), and OTU tables were constructed from the output using a custom Perl script. 
+
+## The blast script is a sh script included below and attached in the folder.
+#blast command to make database from 97_otus file
+makeblastdb -in 97_otus.fasta -dbtype nucl
+#run blastn to the 97 percent OTUs, exclude at 10E-5, take top hit
+blastn -db 97_otus.fasta -query seqs.fna -outfmt 6 -num_alignments 1 -evalue .00001 -out blastn_97.out
+
+## Taxonomy for each sequence was identified using a parser script in Python as attached in this directory.
+#run parser.py
+python parser.py blastn_97.out blastn_97_with_tax.out
